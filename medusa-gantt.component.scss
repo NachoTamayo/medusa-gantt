@@ -1,0 +1,277 @@
+// Tokens del componente. Cada uno apunta a la variable de Bootstrap 5.2 / Medusa equivalente
+// y trae un valor por defecto. Para ajustar el tema basta con redefinir --mg-* en un ancestro.
+:host {
+  display: block;
+  --mg-font: var(--bs-body-font-family, 'Open Sans', system-ui, sans-serif);
+  --mg-fg: var(--bs-body-color, #1b2430);
+  --mg-muted: var(--bs-secondary-color, #5b6674);
+  --mg-surface: var(--bs-body-bg, #fff);
+  --mg-alt: var(--bs-tertiary-bg, #f8f9fb);
+  --mg-head: var(--bs-light, #eef1f5);
+  --mg-line: var(--bs-border-color, #d9dee5);
+  --mg-nonwork: #e6e8ec;
+  --mg-finished: var(--bs-success, #2a7a4b);
+  --mg-running: var(--bs-primary, #0b74b8);
+  --mg-running-soft: #b9d9ee;
+  --mg-idle: #8a94a1;
+  --mg-plan: #6c7683;
+  --mg-delay-bg: #fdf1c4;
+  --mg-delay-border: #b8860b;
+  --mg-delay-fg: #7a5b00;
+  --mg-today: var(--bs-danger, #d11a2a);
+  --mg-crit-bg: #f8d7da;
+  --mg-crit-fg: #842029;
+  --mg-dep: #7a8491;
+  --mg-tooltip-bg: #1b2430;
+  font-family: var(--mg-font);
+  font-size: 14px;
+  color: var(--mg-fg);
+}
+
+.mg {
+  background: var(--mg-surface);
+  border: 1px solid var(--mg-line);
+  border-radius: 4px;
+
+  &__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--mg-line);
+  }
+
+  &__icon {
+    font-size: 18px;
+    line-height: 1;
+    vertical-align: middle;
+    &--warn { color: var(--mg-delay-border); font-size: 16px; }
+  }
+
+  &__scroll {
+    overflow: auto;
+    position: relative;
+    &:focus-visible { outline: 2px solid var(--mg-running); outline-offset: -2px; }
+  }
+
+  &__inner {
+    position: relative;
+    min-width: max-content;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 276px 150px var(--mg-tlw);
+    height: 48px;
+    border-bottom: 1px solid var(--mg-line);
+    background: var(--mg-surface);
+    &--op { background: var(--mg-alt); }
+    &--head {
+      height: 52px;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--mg-head);
+    }
+  }
+
+  &__cell {
+    position: sticky;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    white-space: nowrap;
+    background: inherit;
+  }
+  &__c1 { left: 0; }
+  &__c2 {
+    left: 276px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+    line-height: 1.25;
+    border-right: 1px solid var(--mg-line);
+    &--head { justify-content: center; align-items: flex-start; font-weight: 700; font-size: 13px; }
+  }
+  &__row--head &__c1 { font-weight: 700; font-size: 13px; }
+  &__row--op &__c1 { padding-left: 40px; }
+  &__row--op &__code { font-weight: 400; }
+
+  &__c1, &__c2 { overflow: hidden; }
+  &__name, &__team { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  &__code { font-weight: 700; flex: none; }
+  &__team { font-size: 13px; }
+
+  &__tag {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 10px;
+    background: var(--mg-crit-bg);
+    color: var(--mg-crit-fg);
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; display: inline-block; }
+    &--finished { color: var(--mg-finished); }
+    &--running { color: var(--mg-running); }
+    &--notStarted { color: var(--mg-muted); }
+  }
+
+  &__days { display: flex; }
+  &__day {
+    flex: none;
+    width: var(--mg-dw);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid var(--mg-line);
+    font-weight: 700;
+    font-size: 13px;
+    &--nw { color: var(--mg-muted); background: var(--mg-nonwork); }
+  }
+
+  // Línea de tiempo de cada fila
+  &__tl {
+    position: relative;
+    width: var(--mg-tlw);
+    background-image: linear-gradient(to right, var(--mg-line) 1px, transparent 1px);
+    background-size: var(--mg-dw) 100%;
+  }
+  &__nw {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: var(--mg-nonwork);
+    opacity: 0.75;
+  }
+
+  &__bar {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    box-sizing: border-box;
+
+    &--plan {
+      top: 7px;
+      height: 8px;
+      padding: 0;
+      border: 1px dashed var(--mg-plan);
+      pointer-events: none;
+    }
+    &--main { cursor: pointer; z-index: 1; &:focus-visible { outline: 2px solid var(--mg-fg); outline-offset: 2px; } }
+    &--finished { background: var(--mg-finished); }
+    &--running { background: var(--mg-running-soft); color: var(--mg-fg); }
+    &--idle { background: var(--mg-idle); }
+    &--delayed {
+      background: var(--mg-delay-bg);
+      border: 1px dashed var(--mg-delay-border);
+      color: var(--mg-delay-fg);
+    }
+    &--progress {
+      background: var(--mg-running);
+      z-index: 2;
+      pointer-events: none;
+    }
+  }
+  &__tl--task &__bar--main, &__tl--task &__bar--progress { top: 20px; height: 18px; }
+  &__tl--operation &__bar--main, &__tl--operation &__bar--progress { top: 22px; height: 14px; }
+
+  &__dev {
+    position: absolute;
+    top: 22px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--mg-delay-fg);
+    white-space: nowrap;
+  }
+
+  &__today {
+    position: absolute;
+    bottom: 0;
+    width: 2px;
+    background: var(--mg-today);
+    z-index: 4;
+    pointer-events: none;
+  }
+  &__today-tag {
+    position: absolute;
+    top: 34px;
+    transform: translateX(-50%);
+    z-index: 6;
+    padding: 1px 6px;
+    border-radius: 2px;
+    background: var(--mg-today);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  &__deps {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    pointer-events: none;
+    overflow: visible;
+    path { fill: none; stroke: var(--mg-dep); stroke-width: 1.25; }
+    polygon { fill: var(--mg-dep); }
+  }
+
+  &__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--mg-line);
+    font-size: 12px;
+    color: var(--mg-muted);
+    span { display: inline-flex; align-items: center; gap: 6px; }
+  }
+  &__sw {
+    display: inline-block;
+    width: 22px;
+    height: 10px;
+    border-radius: 10px;
+    &--plan { height: 8px; border: 1px dashed var(--mg-plan); }
+    &--finished { background: var(--mg-finished); }
+    &--running { background: var(--mg-running); }
+    &--delayed { background: var(--mg-delay-bg); border: 1px dashed var(--mg-delay-border); }
+    &--dep { height: 0; border-radius: 0; border-top: 1.5px solid var(--mg-dep); }
+  }
+
+  &__tooltip {
+    position: fixed;
+    z-index: 1080;
+    transform: translate(-50%, calc(-100% - 8px));
+    max-width: 320px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    background: var(--mg-tooltip-bg);
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.4;
+    pointer-events: none;
+  }
+  &__tooltip-title { font-weight: 700; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}

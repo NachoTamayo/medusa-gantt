@@ -1,0 +1,95 @@
+<div class="mg">
+  <div class="mg__toolbar">
+    <div class="btn-group" role="group" aria-label="Escala">
+      <button type="button" class="btn btn-outline-secondary btn-sm"
+              [class.active]="zoom === 'day'" [attr.aria-pressed]="zoom === 'day'"
+              (click)="setZoom('day')">Día</button>
+      <button type="button" class="btn btn-outline-secondary btn-sm"
+              [class.active]="zoom === 'compact'" [attr.aria-pressed]="zoom === 'compact'"
+              (click)="setZoom('compact')">Compacto</button>
+    </div>
+    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="scrollToToday()" [disabled]="todayLeft === null">
+      <span class="material-symbols-outlined mg__icon" aria-hidden="true">today</span> Ir a hoy
+    </button>
+    <ng-content select="[mgToolbar]"></ng-content>
+  </div>
+
+  <div #scroller class="mg__scroll" [style.max-height.px]="maxHeight" tabindex="0"
+       role="region" aria-label="Diagrama de Gantt">
+    <div class="mg__inner" [style.--mg-dw.px]="dayWidth" [style.--mg-tlw.px]="timelineWidth"
+         [style.--mg-left.px]="leftWidth">
+
+      <div class="mg__row mg__row--head" role="row">
+        <div class="mg__cell mg__c1">{{ l.task }}</div>
+        <div class="mg__cell mg__c2 mg__c2--head">{{ l.teamStatus }}</div>
+        <div class="mg__days">
+          <div *ngFor="let d of days" class="mg__day" [class.mg__day--nw]="d.nonWorking">
+            {{ dayWidth > 60 ? d.label : d.shortLabel }}
+          </div>
+        </div>
+      </div>
+
+      <div *ngFor="let r of rows; trackBy: trackRow" class="mg__row"
+           [class.mg__row--task]="r.task.type === 'task'" [class.mg__row--op]="r.task.type === 'operation'"
+           role="row">
+        <div class="mg__cell mg__c1">
+          <span *ngIf="r.task.warning" class="material-symbols-outlined mg__icon mg__icon--warn" aria-label="Aviso">warning_amber</span>
+          <span class="mg__code">{{ r.task.id }}</span>
+          <span class="mg__name" [attr.title]="r.task.name">{{ r.task.name }}</span>
+          <span *ngIf="r.task.critical" class="mg__tag">{{ l.critical }}</span>
+        </div>
+        <div class="mg__cell mg__c2">
+          <span *ngIf="r.task.team" class="mg__team">{{ r.task.team }}</span>
+          <span class="mg__status" [ngClass]="'mg__status--' + r.task.status"><i></i>{{ l.status[r.task.status] }}</span>
+        </div>
+
+        <div class="mg__tl" [ngClass]="'mg__tl--' + r.task.type">
+          <ng-container *ngFor="let d of days; let i = index">
+            <div *ngIf="d.nonWorking" class="mg__nw" [style.left.px]="i * dayWidth" [style.width.px]="dayWidth"></div>
+          </ng-container>
+
+          <div class="mg__bar mg__bar--plan" [style.left.px]="r.planned.left" [style.width.px]="r.planned.width"></div>
+
+          <div class="mg__bar mg__bar--main" [ngClass]="'mg__bar--' + r.mainKind"
+               [style.left.px]="r.main.left" [style.width.px]="r.main.width"
+               role="button" tabindex="0"
+               [attr.aria-label]="r.tooltip.join('. ')"
+               (mouseenter)="showTooltip(r, $event)" (mouseleave)="hideTooltip()"
+               (focus)="showTooltip(r, $event)" (blur)="hideTooltip()"
+               (click)="onActivate(r, $event)"
+               (keydown.enter)="onActivate(r, $event)" (keydown.space)="onActivate(r, $event)">
+            <ng-container *ngIf="r.mainKind !== 'running'">{{ r.progressLabel }}</ng-container>
+          </div>
+          <div *ngIf="r.progress" class="mg__bar mg__bar--progress"
+               [style.left.px]="r.progress.left" [style.width.px]="r.progress.width">{{ r.progressLabel }}</div>
+
+          <div *ngIf="r.deviation" class="mg__dev" [style.left.px]="r.main.left + r.main.width + 6">
+            {{ r.deviation }}<ng-container *ngIf="r.task.note"> · {{ r.task.note }}</ng-container>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="todayLeft !== null" class="mg__today" [style.left.px]="leftWidth + todayLeft" [style.top.px]="headerHeight"></div>
+      <div *ngIf="todayLeft !== null" class="mg__today-tag" [style.left.px]="leftWidth + todayLeft + 1">{{ todayLabel }}</div>
+
+      <svg class="mg__deps" [attr.width]="leftWidth + timelineWidth" [attr.height]="totalHeight" aria-hidden="true">
+        <g *ngFor="let d of dependencies">
+          <path [attr.d]="d.path" />
+          <polygon [attr.points]="d.arrow" />
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="mg__legend">
+    <span><i class="mg__sw mg__sw--plan"></i>{{ l.legend.planned }}</span>
+    <span><i class="mg__sw mg__sw--finished"></i>{{ l.legend.finished }}</span>
+    <span><i class="mg__sw mg__sw--running"></i>{{ l.legend.running }}</span>
+    <span><i class="mg__sw mg__sw--delayed"></i>{{ l.legend.delayed }}</span>
+    <span><i class="mg__sw mg__sw--dep"></i>{{ l.legend.dependency }}</span>
+  </div>
+
+  <div *ngIf="tooltip" class="mg__tooltip" role="tooltip" [style.left.px]="tooltip.x" [style.top.px]="tooltip.y">
+    <div *ngFor="let line of tooltip.lines; let i = index" [class.mg__tooltip-title]="i === 0">{{ line }}</div>
+  </div>
+</div>
